@@ -1,0 +1,57 @@
+---
+title: "Jaxon_Result"
+author: "Jaxon Zhang"
+date: "2024-10-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(reticulate)
+```
+
+```{python load packages}
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, roc_auc_score
+from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.feature_selection import RFE
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score, confusion_matrix
+from matplotlib import pyplot as plt
+```
+
+## Brief Data Cleaning
+
+Ados are the metric that is directly related with the outcome variable. It is necessary to drop it since our goal is to find the biomarkers that highly related with the Autism Symptoms.
+
+ADOS diagnostic algorithms consisting of two behavioral domains: Social Affect (SA) and Restricted and Repetitive Behaviors (RRB) were used to determine an ADOS total score, which provides a continuous measure of overall ASD symptom severity.
+
+
+## Bioinformatics
+
+Our goal is to find a protein panel that can best predict if levels of expression of them can be used to predict if a person has Autism.
+
+### General Strategy
+
+- Remove the bio-marker that is highly correlated with each other with the threshold `> 0.9`.
+- Apply backwards selection using L1 logistic regression to select top 20 features based on feature importance.
+- Apply random forest with 5 folds cross validation to select top 20 features based on the average feature importance
+- Union the 40 features to use them as the base model, apply backwards selection using elastic net logistic regression (50% L1 and 50% L2) to select a protein panel with 9 bio-markers
+- Fit the final model using L1 logistic regression of 6 bio-markers and achieve the ROC-AUC value of 87.29% 
+
+### Final Confusion Matrix
+
+```{python confusion Matrix}
+cm = np.loadtxt('../data/confusion_matrix.csv', delimiter=',')
+fig, ax = plt.subplots(figsize=[8, 8]);
+ax.imshow(cm, cmap="Blues");
+ax.xaxis.set(ticks=(0, 1), ticklabels=('Predicted TD', 'Predicted ASD'));
+ax.yaxis.set(ticks=(0, 1), ticklabels=('Actual TD', 'Actual ASD'));
+for i in range(2):
+  for j in range(2):
+    ax.text(j, i, cm[i, j], ha='center', va='center', color='black', fontdict={'fontsize': 20});
+ax.grid(False);
+ax.set_title('Confusion Matrix of Final Predictions');
+plt.show();
+```
