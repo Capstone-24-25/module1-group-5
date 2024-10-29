@@ -1,4 +1,6 @@
 scripts/jaxon_draft.rmd
+results/report_cache
+results/report_files
 Jaxon_personal_note
 .Rproj.user
 .Rhistory
