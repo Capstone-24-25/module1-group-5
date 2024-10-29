@@ -1,0 +1,211 @@
+---
+title: "Question3"
+author: "Wentao(Eric) Zhang"
+date: "2024-10-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+library(infer)
+library(randomForest)
+library(tidymodels)
+library(modelr)
+library(yardstick)
+load("/Users/wentaozhang/Downloads/biomarker-clean.RData")
+
+
+
+```
+
+
+```{r}
+
+## MULTIPLE TESTING
+####################
+
+# function to compute tests
+test_fn <- function(.df) {
+  t_test(.df,
+    # compute t test on level, comparing the two levels of group
+    formula = level ~ group,
+    # mean ASD - mean TD
+    order = c("ASD", "TD"),
+    alternative = "two-sided",
+    var.equal = F
+  )
+}
+
+
+
+```
+
+```{r}
+
+ttests_out <- biomarker_clean %>%
+  # drop ADOS score
+  select(-ados) %>%
+  # arrange in long format
+  pivot_longer(-group,
+    # the group column should be left as-is
+    names_to = "protein",
+    # Each unique column name in the original data
+    # becomes a row in the protein column
+    values_to = "level"
+    # he values from each column corresponding to
+    # each protein will be stored in the level column.
+  ) %>%
+  # nest by protein
+  nest(data = c(level, group)) %>%
+  # compute t tests
+  mutate(ttest = map(data, test_fn)) %>%
+  unnest(ttest) %>%
+  # sort by p-value
+  arrange(p_value) %>%
+  # multiple testing correction
+  mutate(
+    m = n(),
+    hm = log(m) + 1 / (2 * m) - digamma(1),
+    rank = row_number(),
+    p.adj = m * hm * p_value / rank
+  )
+
+# select significant proteins
+proteins_s1 <- ttests_out %>%
+  slice_min(p.adj, n = 20) %>%
+  pull(protein)
+
+
+```
+
+```{r}
+## RANDOM FOREST
+##################
+
+# store predictors and response separately
+predictors <- biomarker_clean %>%
+  select(-c(group, ados))
+
+response <- biomarker_clean %>%
+  pull(group) %>%
+  factor()
+
+# fit RF
+set.seed(101422)
+rf_out <- randomForest(
+  x = predictors,
+  y = response,
+  ntree = 1000,
+  importance = T
+)
+
+
+
+```
+
+```{r}
+# check errors
+rf_out$confusion
+
+
+```
+
+```{r}
+# compute importance scores
+proteins_s2 <- rf_out$importance %>%
+  as_tibble() %>%
+  mutate(protein = rownames(rf_out$importance)) %>%
+  slice_max(MeanDecreaseGini, n = 20) %>%
+  pull(protein)
+
+
+```
+
+```{r}
+## LOGISTIC REGRESSION
+#######################
+
+# select subset of interest 
+# use union
+proteins_sstar <- union(proteins_s1, proteins_s2)
+
+
+biomarker_sstar <- biomarker_clean %>%
+  select(group, any_of(proteins_sstar)) %>%
+  mutate(class = (group == "ASD")) %>%
+  select(-group)
+
+# partition into training and test set
+set.seed(101422)
+biomarker_split <- biomarker_sstar %>%
+  initial_split(prop = 0.8)
+
+# fit logistic regression model to training set
+fit <- glm(class ~ .,
+  data = training(biomarker_split),
+  family = "binomial"
+)
+
+
+```
+
+```{r}
+# evaluate errors on test set
+class_metrics <- metric_set(
+  sensitivity,
+  specificity,
+  accuracy,
+  roc_auc
+)
+
+testing(biomarker_split) %>%
+  add_predictions(fit, type = "response") %>%
+  mutate(est = as.factor(pred > 0.5), tr_c = as.factor(class)) %>%
+  class_metrics(
+    estimate = est,
+    truth = tr_c, pred,
+    event_level = "second"
+  )
+```
+
+The differences in metrics between the original and modified results arise from the changes made to the selection of predictive proteins and the method for combining them.
+
+### Summary of Modifications and Their Impact:
+
+1. **Increasing the Number of Top Proteins**:
+   - In the modified code, you selected **20 proteins** from each method (t-test and Random Forest) rather than the original **10 proteins**.
+   - This increased selection expands the feature set used in the model, potentially including proteins that are less predictive but still correlated with the class labels. This can affect model sensitivity and specificity differently due to additional, possibly noisier, features.
+
+2. **Using a Fuzzy Intersection (Union)**:
+   - In the modified code, `union(proteins_s1, proteins_s2)` is used instead of `intersect(proteins_s1, proteins_s2)`.
+   - This change means that proteins significant in **either** selection method are included, rather than only those significant in **both**. By using the union, the feature set likely includes more proteins, providing a broader range of predictors but potentially reducing the specificity and precision of the model.
+
+### Impact on Results
+
+#### 1. **Sensitivity** (True Positive Rate):
+   - In the original code, sensitivity was higher (0.812) because the intersection method likely selected proteins that were more robust and predictive, ensuring that the model was better at correctly identifying ASD cases.
+   - In the modified code, sensitivity dropped to 0.562, likely due to the inclusion of additional, less informative proteins. This may have diluted the predictive strength, making the model less accurate in identifying true positives.
+
+#### 2. **Specificity** (True Negative Rate):
+   - The original model had a specificity of 0.733, showing balanced performance.
+   - The modified model achieved a specificity of 1, likely due to overfitting to the control class (non-ASD cases). By adding potentially noisy features, the model may have learned to classify only non-ASD cases more reliably but at the cost of missing actual ASD cases (lower sensitivity).
+
+#### 3. **Accuracy**:
+   - Accuracy remained the same at 0.774 in both cases, which indicates that while the class distributions are balanced, the trade-off between sensitivity and specificity affected the identification of ASD cases rather than the overall correctness of classification.
+
+#### 4. **ROC AUC**:
+   - ROC AUC increased slightly from 0.883 to 0.896 in the modified model. The union of features might have contributed to a broader range of predictive signals, albeit with trade-offs in sensitivity and specificity. The ROC AUC can sometimes increase with a larger feature set, even if individual class metrics like sensitivity or specificity vary.
+
+### Summary
+The modified approach broadened the feature set using a fuzzy intersection and included more top proteins from each method. This led to:
+- Lower sensitivity, as the additional proteins may have introduced noise.
+- Higher specificity, possibly due to overfitting to non-ASD cases.
+- A similar accuracy but a slight increase in ROC AUC.
+
+This highlights the trade-offs in feature selection strategies: more features can sometimes improve general ROC AUC but might reduce the model's ability to identify positive cases accurately (as shown by sensitivity).
+
