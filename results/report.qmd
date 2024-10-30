@@ -43,6 +43,8 @@ Summarize your findings here. I've included some subheaders in a way that seems 
 
 Tasks 1-2
 
+Many of the biomarkers had outliers in their data. I tabulated the amount of outliers per each biomarker. 91 biomarkers have at least 3 outliers, only 13 have atleast 4, and only the biomarker hnRNP K had more than 4 with 6 outliers. By far, the typically developing group was much more likely to have outliers. Of those 91 biomarkers with 3 or more outliers, only 3 of those biomarkers were part of the ASD group. All biomarkers with more than 3 outliers were from the typically developing group.
+
 ### Methodlogical variations
 
 Task 3
