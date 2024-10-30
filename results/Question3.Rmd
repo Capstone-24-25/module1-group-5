@@ -19,7 +19,9 @@ library(modelr)
 library(yardstick)
 load("/Users/wentaozhang/Downloads/biomarker-clean.RData")
 
-
+data_split <- initial_split(biomarker_clean, prop = 0.8)
+train_data <- training(data_split)
+test_data <- testing(data_split)
 
 ```
 
@@ -142,6 +144,9 @@ biomarker_sstar <- biomarker_clean %>%
 
 # partition into training and test set
 set.seed(101422)
+
+# partition into training and test set
+set.seed(101422)
 biomarker_split <- biomarker_sstar %>%
   initial_split(prop = 0.8)
 
@@ -175,15 +180,20 @@ testing(biomarker_split) %>%
 
 The differences in metrics between the original and modified results arise from the changes made to the selection of predictive proteins and the method for combining them.
 
-### Summary of Modifications and Their Impact:
 
-1. **Increasing the Number of Top Proteins**:
+1. **Performing the feature selection on only the training partition**
+   - **Original Method**: When feature selection was done on the entire dataset (both training and test data), the model was likely overfitting to the data as it “saw” the test data before evaluation. This means that any feature selection might have indirectly optimized the model for the test data, leading to inflated performance metrics.
+   - **Modified Method**: By restricting feature selection to the training set only, we prevent the test data from influencing feature selection. This ensures the model’s performance on the test set is a more genuine reflection of its ability to generalize to unseen data.
+
+
+2. **Increasing the Number of Top Proteins**:
    - In the modified code, you selected **20 proteins** from each method (t-test and Random Forest) rather than the original **10 proteins**.
    - This increased selection expands the feature set used in the model, potentially including proteins that are less predictive but still correlated with the class labels. This can affect model sensitivity and specificity differently due to additional, possibly noisier, features.
 
-2. **Using a Fuzzy Intersection (Union)**:
+3. **Using a Fuzzy Intersection (Union)**:
    - In the modified code, `union(proteins_s1, proteins_s2)` is used instead of `intersect(proteins_s1, proteins_s2)`.
    - This change means that proteins significant in **either** selection method are included, rather than only those significant in **both**. By using the union, the feature set likely includes more proteins, providing a broader range of predictors but potentially reducing the specificity and precision of the model.
+
 
 ### Impact on Results
 

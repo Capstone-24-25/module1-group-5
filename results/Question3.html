@@ -401,7 +401,7 @@ library(randomForest)</code></pre>
 ## ✖ randomForest::margin()  masks ggplot2::margin()
 ## ✖ yardstick::spec()       masks readr::spec()
 ## ✖ recipes::step()         masks stats::step()
-## • Search for functions across packages at https://www.tidymodels.org/find/</code></pre>
+## • Use tidymodels_prefer() to resolve common conflicts.</code></pre>
 <pre class="r"><code>library(modelr)</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;modelr&#39;
@@ -414,7 +414,11 @@ library(randomForest)</code></pre>
 ## 
 ##     bootstrap</code></pre>
 <pre class="r"><code>library(yardstick)
-load(&quot;/Users/wentaozhang/Downloads/biomarker-clean.RData&quot;)</code></pre>
+load(&quot;/Users/wentaozhang/Downloads/biomarker-clean.RData&quot;)
+
+data_split &lt;- initial_split(biomarker_clean, prop = 0.8)
+train_data &lt;- training(data_split)
+test_data &lt;- testing(data_split)</code></pre>
 <pre class="r"><code>## MULTIPLE TESTING
 ####################
 
@@ -506,6 +510,9 @@ biomarker_sstar &lt;- biomarker_clean %&gt;%
 
 # partition into training and test set
 set.seed(101422)
+
+# partition into training and test set
+set.seed(101422)
 biomarker_split &lt;- biomarker_sstar %&gt;%
   initial_split(prop = 0.8)
 
@@ -540,9 +547,22 @@ testing(biomarker_split) %&gt;%
 <p>The differences in metrics between the original and modified results
 arise from the changes made to the selection of predictive proteins and
 the method for combining them.</p>
-<div id="summary-of-modifications-and-their-impact" class="section level3">
-<h3>Summary of Modifications and Their Impact:</h3>
 <ol style="list-style-type: decimal">
+<li><strong>Performing the feature selection on only the training
+partition</strong>
+<ul>
+<li><strong>Original Method</strong>: When feature selection was done on
+the entire dataset (both training and test data), the model was likely
+overfitting to the data as it “saw” the test data before evaluation.
+This means that any feature selection might have indirectly optimized
+the model for the test data, leading to inflated performance
+metrics.</li>
+<li><strong>Modified Method</strong>: By restricting feature selection
+to the training set only, we prevent the test data from influencing
+feature selection. This ensures the model’s performance on the test set
+is a more genuine reflection of its ability to generalize to unseen
+data.</li>
+</ul></li>
 <li><strong>Increasing the Number of Top Proteins</strong>:
 <ul>
 <li>In the modified code, you selected <strong>20 proteins</strong> from
@@ -567,7 +587,6 @@ predictors but potentially reducing the specificity and precision of the
 model.</li>
 </ul></li>
 </ol>
-</div>
 <div id="impact-on-results" class="section level3">
 <h3>Impact on Results</h3>
 <div id="sensitivity-true-positive-rate" class="section level4">
