@@ -14,7 +14,7 @@ execute:
   cache: true
 ---
 
-**Uncomment the line in the source code to download python modules if necessary**
+**Uncomment the line in the source code to download python modules and set up virtual environment if necessary**
 
 ```{r}
 # load any other packages and read data here
@@ -26,7 +26,7 @@ library(gridExtra)
 library(readr)
 
 # uncomment the line to download python modules
-py_install(c('pandas', 'numpy', 'scikit-learn', 'matplotlib'))
+# py_install(c('pandas', 'numpy', 'scikit-learn', 'matplotlib', 'jupyter'))
 ```
 
 
