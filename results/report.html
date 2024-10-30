@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="List names here">
-<meta name="dcterms.date" content="2024-10-29">
+<meta name="dcterms.date" content="2024-10-30">
 
 <title>Biomarkers of ASD</title>
 <style>
@@ -68,7 +68,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Updated</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">October 29, 2024</p>
+      <p class="date">October 30, 2024</p>
     </div>
   </div>
   
@@ -80,14 +80,13 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Use this as a template. Keep the headers and remove all other text. In all, your report can be quite short. When it is complete, render and then push changes to your team repository.</p>
+<p><strong>Uncomment the line in the source code to download python modules if necessary</strong></p>
 <section id="abstract" class="level2">
 <h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
 <p>Write a brief one-paragraph abstract that describes the contents of your write-up.</p>
 </section>
 <section id="dataset" class="level2">
 <h2 class="anchored" data-anchor-id="dataset">Dataset</h2>
-<p>Write a brief data description, including: how data were obtained; sample characteristics; variables measured; and data preprocessing. This can be largely based on the source paper and should not exceed 1-2 paragraphs.</p>
 <p>This data contains information on whether or not boys from the age of 18 months to 8 years have Autism Spectrum Disorder (ASD) and their protein serum samples. There were a total 154 boys measured through blood collection and SomaLogic analysis, with 76 being diagnosed with ASD and 78 in the typically developing (TD) group. The mean ages for these groups were 5.6 and 5.7 years respectively with standard deviations of 1.7 and 2.0 years. There were 73 Caucasian, 32 Hispanic/Latino, 17 African American/Black, 5 Asian or Pacific Islander, 23 multiple ethnicities or other, and 4 not reported subjects in the dataset. Comorbidities were measured and it was found that 75.3% of TD boys and 52.8% of ASD boys had no comorbidities and the next most common was seasonal allergies which 41.7% of ASD boys had and 22.4% of TD boys had. In addition, the ASD group underwent assessment from a clinical psychologist to obtain an Autism Diagnostic Observation Schedule (ADOS) score, which provides a continuous measure of overall ASD symptom severity. A total of 1,317 proteins were measured, but 192 failed the quality control test so 1,125 proteins were analyzed. Of the 1,125 proteins, that data was normalized by taking a log 10 transform and then a z-transformation. For more preprocessing, to deal with outliers, any z-transformed values outside the range of -3 to 3 were clipped to -3 and 3, respectively.</p>
 </section>
 <section id="summary-of-published-analysis" class="level2">
@@ -159,19 +158,94 @@ classDef default scale:1;
 </section>
 <section id="findings" class="level2">
 <h2 class="anchored" data-anchor-id="findings">Findings</h2>
-<p>Summarize your findings here. I’ve included some subheaders in a way that seems natural to me; you can structure this section however you like.</p>
 <section id="impact-of-preprocessing-and-outliers" class="level3">
 <h3 class="anchored" data-anchor-id="impact-of-preprocessing-and-outliers">Impact of preprocessing and outliers</h3>
-<p>Tasks 1-2</p>
-<p>Many of the biomarkers had outliers in their data. I tabulated the amount of outliers per each biomarker. 91 biomarkers have at least 3 outliers, only 13 have atleast 4, and only the biomarker hnRNP K had more than 4 with 6 outliers. By far, the typically developing group was much more likely to have outliers. Of those 91 biomarkers with 3 or more outliers, only 3 of those biomarkers were part of the ASD group. All biomarkers with more than 3 outliers were from the typically developing group.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="report_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="report_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="report_files/figure-html/unnamed-chunk-4-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="report_files/figure-html/unnamed-chunk-4-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="report_files/figure-html/unnamed-chunk-4-5.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="report_files/figure-html/unnamed-chunk-4-6.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="report_files/figure-html/unnamed-chunk-4-7.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>To begin with the preprocessing of the data, we first look at the raw proteins to see how they are distributed. From observing the distribution of a sample of the proteins from the raw file, it is clear that many of them have skewed distributions. These skewed distributions could be due to high variability in the protein levels which leads to outliers that are affecting our data and predictions. To improve our model and predictions, we can log transform the proteins to help normalize the distributions. By doing this, it helps to improve our models performance since machine learning techniques like random forest will give you better predictions when the input data is more normally distributed. As we can observe from the difference in the raw and the log transformed histograms for this sample of proteins, the transformation helps to normalize the distributions of the raw proteins in our dataset.</p>
 </section>
+</section>
+<section id="read-in-data" class="level1">
+<h1>read in data</h1>
+<p>If we examine the outlier_summary table, it shows us the biomarkers that have an outlier point as well as the group and ados score for the subject that corresponds to that outlier point. Overall, there are 1822 biomarkers which have at least 1 outlying point. Attempting to identify individual subjects we can filter to only see biomarkers which have an outlier count of 1. Doing this, we see ados values ranging from 6-23 as well as NA. Each of these 18 unique ados values likely correspond to an individual outlying subject that has many outlying biomarkers. There are 449 outlying biomarkers which correspond to a subject which is typically developing, while there are 922 biomarkers which correspond to a subject which is autistic. With this, we can conclude that it’s more likely for an autistic subject to be an outlier subject than it is for those which are typically developing.</p>
 <section id="methodlogical-variations" class="level3">
 <h3 class="anchored" data-anchor-id="methodlogical-variations">Methodlogical variations</h3>
 <p>Task 3</p>
 </section>
 <section id="improved-classifier" class="level3">
 <h3 class="anchored" data-anchor-id="improved-classifier">Improved classifier</h3>
-<p>Task 4</p>
+<p>The final protein panel is made of 6 bio-markers showed below:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>IL-17 RC, SRCN1, IgD, FSTL1, IL-6 sRa, Coagulation Factor I</code></pre>
+</div>
+</div>
+<p>We use the ROC-AUC metric for testing. Our approach simplifies the original 9-biomarkers panel to 6 while yielding a comparable predictive power. It can be interpreted as that the possibility of ranking a randomly chosen ASD patient higher than the possibility of ranking a randomly chosen TD patient.</p>
+<p>The confusion matrix is plotted below</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[[&lt;matplotlib.axis.XTick object at 0x13abc9a60&gt;, &lt;matplotlib.axis.XTick object at 0x13abe81d0&gt;], [Text(0, 0, 'Predicted TD'), Text(1, 0, 'Predicted ASD')]]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[&lt;matplotlib.axis.YTick object at 0x13aceca10&gt;, &lt;matplotlib.axis.YTick object at 0x13865ba10&gt;], [Text(0, 0, 'Actual TD'), Text(0, 1, 'Actual ASD')]]</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="report_files/figure-html/confusion%20matrix-5.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 </section>
 

@@ -14,7 +14,7 @@ execute:
   cache: true
 ---
 
-Use this as a template. Keep the headers and remove all other text. In all, your report can be quite short. When it is complete, render and then push changes to your team repository.
+**Uncomment the line in the source code to download python modules if necessary**
 
 ```{r}
 # load any other packages and read data here
@@ -23,38 +23,10 @@ library(reticulate)
 library(ggplot2)
 library(dplyr)
 library(gridExtra)
+library(readr)
 
 # uncomment the line to download python modules
 # py_install(c('pandas', 'numpy', 'sklearn', 'matplotlib'))
-```
-
-```{python load packages}
-import pandas as pd
-import numpy as np
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, roc_auc_score
-from sklearn.model_selection import train_test_split, StratifiedKFold
-from sklearn.feature_selection import RFE
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score, confusion_matrix
-from matplotlib import pyplot as plt
-import pickle
-
-with open('../data/q4_variables.pkl', 'rb') as f:
-  q4_variables = pickle.load(f)
-  
-biomarker_rfe_top10_x = q4_variables['biomarker_rfe_top10_x'] 
-biomarker_rfe_top10_y =  q4_variables['biomarker_rfe_top10_y']
-biomarker_rfe_top10_names = q4_variables['biomarker_rfe_top10_names']
-offset_index = q4_variables['offset_index']
-label_x = q4_variables['label_x']
-label_y = q4_variables['label_y']
-biomarker_name = q4_variables['biomarker_name']
-offsets_1 = q4_variables['offsets_1']
-ranking_sorted = q4_variables['ranking_sorted']
-x_axis = q4_variables['x_axis']
-y_axis = q4_variables['y_axis']
-fi_rf_sorted = q4_variables['fi_rf_sorted']
 ```
 
 ## Abstract
@@ -103,6 +75,20 @@ classDef default scale:1;
 Logistic Regression is used for the second round of selection. The L1 Lasso Regularization is used to select the bio-markers from the total 1194 bio-markers (after dropping the bio-markers with high correlation). L1 Regularization penalizes the features with the least absolute coefficients, or weights, in the logit, and eventually drives them to zero. Those ones are bio-markers that are considered to be less important. We select total 20 candidates with the highest rank. Top ten bio-markers are plotted for neat visualization purpose.
 
 ```{python L1 logistic regression - Recursive Feature Elimination}
+import pickle
+from matplotlib import pyplot as plt
+import numpy as np
+
+with open('../data/q4_variables.pkl', 'rb') as f:
+  q4_variables = pickle.load(f)
+  
+biomarker_rfe_top10_x = q4_variables['biomarker_rfe_top10_x'] 
+biomarker_rfe_top10_y =  q4_variables['biomarker_rfe_top10_y']
+biomarker_rfe_top10_names = q4_variables['biomarker_rfe_top10_names']
+offset_index = q4_variables['offset_index']
+x_axis = q4_variables['x_axis']
+y_axis = q4_variables['y_axis']
+
 fig, ax = plt.subplots(figsize=[10, 6]);
 plt.scatter(x=x_axis, y=y_axis, s=1);
 
@@ -139,6 +125,19 @@ Random forest Algorithm is applied for the third round of selection. The Gini Im
 We then union two sets of candidates to serve as the pool of our final selection.
 
 ```{python}
+import pickle
+from matplotlib import pyplot as plt
+import numpy as np
+
+with open('../data/q4_variables.pkl', 'rb') as f:
+  q4_variables = pickle.load(f)
+  
+label_x = q4_variables['label_x']
+label_y = q4_variables['label_y']
+offsets_1 = q4_variables['offsets_1']
+biomarker_name = q4_variables['biomarker_name']
+fi_rf_sorted = q4_variables['fi_rf_sorted']
+
 fig, ax = plt.subplots(figsize=[10, 6])
 ax.scatter(x=range(1194), y=fi_rf_sorted, s=1, alpha=0.8);
 
@@ -222,7 +221,7 @@ grid.arrange(p71, p72,  ncol = 2)
 To begin with the preprocessing of the data, we first look at the raw proteins to see how they are distributed. From observing the distribution of a sample of the proteins from the raw file, it is clear that many of them have skewed distributions. These skewed distributions could be due to high variability in the protein levels which leads to outliers that are affecting our data and predictions. To improve our model and predictions, we can log transform the proteins to help normalize the distributions. By doing this, it helps to improve our models performance since machine learning techniques like random forest will give you better predictions when the input data is more normally distributed. As we can observe from the difference in the raw and the log transformed histograms for this sample of proteins, the transformation helps to normalize the distributions of the raw proteins in our dataset.
 
 ```{r}
-var_names <- read.csv('../data/biomarker-raw.csv', # prevent interpreting the first row as header 
+var_names <- read_csv('../data/biomarker-raw.csv', # prevent interpreting the first row as header 
                       n_max = 2, # read only 2 rows
                       col_names = F,  # exclude first two columns
                       col_select = -(1:2) ) %>%  # switching rows and columns
@@ -234,7 +233,7 @@ var_names <- read.csv('../data/biomarker-raw.csv', # prevent interpreting the fi
 # read in data
 
 ```{r}
-biomarker_clean <- read_csv("C:/Users/joshc/Downloads/biomarker-raw.csv",
+biomarker_clean <- read_csv("../data/biomarker-raw.csv",
                             skip = 2,
                             col_select = -2L,
                             col_names = c(
@@ -279,4 +278,43 @@ Task 3
 
 ### Improved classifier
 
-Task 4
+The final protein panel is made of 6 bio-markers showed below:
+
+```{python print results}
+with open('../data/q4_variables.pkl', 'rb') as f:
+  q4_variables = pickle.load(f)
+  
+protein_panel_name = q4_variables['protein_panel_name']
+
+panel = ''
+for biomarker in protein_panel_name:
+  panel += biomarker + ', '
+
+print(panel[:-3])
+```
+
+We use the ROC-AUC metric for testing. Our approach simplifies the original 9-biomarkers panel to 6 while yielding a comparable predictive power. It can be interpreted as that the possibility of ranking a randomly chosen ASD patient higher than the possibility of ranking a randomly chosen TD patient. 
+
+The confusion matrix is plotted below
+
+```{python confusion matrix}
+import pickle
+from matplotlib import pyplot as plt
+import numpy as np
+
+with open('../data/q4_variables.pkl', 'rb') as f:
+  q4_variables = pickle.load(f)
+
+cm = np.loadtxt('../data/confusion_matrix.csv', delimiter=',')
+fig, ax = plt.subplots(figsize=[8, 8])
+ax.imshow(cm, cmap="Blues")
+ax.xaxis.set(ticks=(0, 1), ticklabels=('Predicted TD', 'Predicted ASD'))
+ax.yaxis.set(ticks=(0, 1), ticklabels=('Actual TD', 'Actual ASD'))
+for i in range(2):
+  for j in range(2):
+    ax.text(j, i, cm[i, j], ha='center', va='center', color='black', fontdict={'fontsize': 20})
+ax.grid(False)
+ax.set_title('Confusion Matrix of Final Predictions')
+plt.show();
+```
+
