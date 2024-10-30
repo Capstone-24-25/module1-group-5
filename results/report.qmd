@@ -227,7 +227,63 @@ grid.arrange(p71, p72,  ncol = 2)
 
 From observing the distribution of a sample of the proteins from the raw file, it is clear that many of them have skewed distributions. These skewed distributions could be due to high variability in the protein levels which leads to outliers that are affecting our data and predictions. To improve our model and predictions, we can log transform the proteins to help normalize the distributions. By doing this, it helps to improve our models performance since machine learning techniques like random forest will give you better predictions when the input data is more normally distributed. As we can observe from the difference in the raw and the log transformed histograms for this sample of proteins, the transformation helps to normalize the distributions of the raw proteins in our dataset.
 
-Many of the biomarkers had outliers in their data. I tabulated the amount of outliers per each biomarker. 91 biomarkers have at least 3 outliers, only 13 have atleast 4, and only the biomarker hnRNP K had more than 4 with 6 outliers. By far, the typically developing group was much more likely to have outliers. Of those 91 biomarkers with 3 or more outliers, only 3 of those biomarkers were part of the ASD group. All biomarkers with more than 3 outliers were from the typically developing group.
+'''{r}
+var_names <- read.csv('../data/biomarker-raw.csv',
+                      # prevent interpreting the first row as header
+                      col_names = F,
+                      # read only 2 rows
+                      n_max = 2,
+                      # exclude first two columns
+                      col_select = -(1:2)
+) %>%
+  # switching rows and columns
+  t() %>%
+  as_tibble() %>%
+  # name, abbreviate are the new name. V1, V2 are the the default old neames
+  rename(
+    name = V1,
+    abbreviation = V2
+  ) %>%
+  na.omit()
+
+
+
+# read in data
+biomarker_clean <- read.csv('../data/biomarker-raw.csv',
+                            skip = 2,
+                            col_select = -2L,
+                            col_names = c(
+                              "group",
+                              "empty",
+                              pull(var_names, abbreviation),
+                              "ados"
+                            ),
+                            # Treat '-' and '' as NA.
+                            na = c("-", "")
+) %>%
+  filter(!is.na(group)) %>%
+  mutate(across(
+    .cols = -c(group, ados),
+    ~ scale(log10(.x))[, 1]
+  )) %>%
+  select(group, ados, everything())
+
+outlier_df <- biomarker_clean %>%
+  mutate(across(
+    .cols = -c(group, ados),  # Exclude non-numeric columns
+    ~ ifelse(abs(.) > 3, ., NA) 
+  ))
+
+outlier_summary <- outlier_df %>%
+  select(group, ados, everything()) %>%
+  pivot_longer(-c(group, ados), names_to = "biomarker", values_to = "value") %>%
+  filter(!is.na(value)) %>%  # Keep only outliers
+  group_by(group, ados, biomarker) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  filter(count > 1)
+'''
+
+Q2) If we examine the outlier_summary table, it shows us the biomarkers that have an outlier point as well as the group and ados score for the subject that corresponds to that outlier point. Overall, there are 1822 biomarkers which have at least 1 outlying point. Attempting to identify individual subjects we can filter to only see biomarkers which have an outlier count of 1. Doing this, we see ados values ranging from 6-23 as well as NA. Each of these 18 unique ados values likely correspond to an individual outlying subject that has many outlying biomarkers. There are 449 outlying biomarkers which correspond to a subject which is typically developing, while there are 922 biomarkers which correspond to a subject which is autistic. With this, we can conclude that it's more likely for an autistic subject to be an outlier subject than it is for those which are typically developing.
 
 ### Methodlogical variations
 
