@@ -26,8 +26,9 @@ library(gridExtra)
 library(readr)
 
 # uncomment the line to download python modules
-# py_install(c('pandas', 'numpy', 'sklearn', 'matplotlib'))
+py_install(c('pandas', 'numpy', 'scikit-learn', 'matplotlib'))
 ```
+
 
 ## Abstract
 
@@ -77,6 +78,7 @@ Logistic Regression is used for the second round of selection. The L1 Lasso Regu
 ```{python L1 logistic regression - Recursive Feature Elimination}
 import pickle
 from matplotlib import pyplot as plt
+import pandas as pd
 import numpy as np
 
 with open('../data/q4_variables.pkl', 'rb') as f:
@@ -127,6 +129,7 @@ We then union two sets of candidates to serve as the pool of our final selection
 ```{python}
 import pickle
 from matplotlib import pyplot as plt
+import pandas as pd
 import numpy as np
 
 with open('../data/q4_variables.pkl', 'rb') as f:
