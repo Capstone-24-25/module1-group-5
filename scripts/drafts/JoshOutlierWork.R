@@ -35,25 +35,19 @@ biomarker_clean <- read_csv("C:/Users/joshc/Downloads/biomarker-raw.csv",
                             na = c("-", "")
 ) %>%
   filter(!is.na(group)) %>%
-  # log transform, center and scale, and trim
-  # accross apply the functions to all cols at once, but exclude group and ados here.
   mutate(across(
     .cols = -c(group, ados),
     ~ scale(log10(.x))[, 1]
   )) %>%
-  # reorder columns
   select(group, ados, everything())
 
-outlier_threshold <- 3  # You can adjust this value as needed
-
-# Identify outliers
+outlier_threshold <- 3 
 outlier_df <- biomarker_clean %>%
   mutate(across(
-    .cols = -c(group, ados),  # Exclude non-numeric columns
-    ~ ifelse(abs(.) > outlier_threshold, ., NA)  # Retain outliers; set non-outliers to NA
+    .cols = -c(group, ados),  
+    ~ ifelse(abs(.) > outlier_threshold, ., NA) 
   ))
 
-# Create a summary of outliers per subject
 outlier_summary <- outlier_df %>%
   select(group, ados, everything()) %>%
   pivot_longer(-c(group, ados), names_to = "biomarker", values_to = "value") %>%
