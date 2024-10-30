@@ -1,7 +1,7 @@
 ---
 title: "Biomarkers of ASD"
-subtitle: "If you want a subtitle put it here"
-author: "List names here"
+subtitle: ""
+author: "Tess Ivinjack, Josh Charfauros, Jaxon Zhang, Wentao (Eric) Zhang"
 date: last-modified
 published-title: "Updated"
 editor: visual
@@ -28,7 +28,6 @@ library(readr)
 # uncomment the line to download python modules
 # py_install(c('pandas', 'numpy', 'scikit-learn', 'matplotlib', 'jupyter'))
 ```
-
 
 ## Abstract
 
@@ -233,7 +232,7 @@ var_names <- read_csv('../data/biomarker-raw.csv', # prevent interpreting the fi
   na.omit()
 ```
 
-# read in data
+### Read in data
 
 ```{r}
 biomarker_clean <- read_csv("../data/biomarker-raw.csv",
@@ -296,7 +295,7 @@ for biomarker in protein_panel_name:
 print(panel[:-3])
 ```
 
-We use the ROC-AUC metric for testing. Our approach simplifies the original 9-biomarkers panel to 6 while yielding a comparable predictive power. It can be interpreted as that the possibility of ranking a randomly chosen ASD patient higher than the possibility of ranking a randomly chosen TD patient. 
+We use the ROC-AUC metric for testing. Our approach simplifies the original 9-biomarkers panel to 6 while yielding a comparable predictive power. It can be interpreted as that the possibility of ranking a randomly chosen ASD patient higher than the possibility of ranking a randomly chosen TD patient.
 
 The confusion matrix is plotted below
 
@@ -320,4 +319,3 @@ ax.grid(False)
 ax.set_title('Confusion Matrix of Final Predictions')
 plt.show();
 ```
-
