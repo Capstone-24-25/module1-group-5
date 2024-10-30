@@ -2,6 +2,7 @@
 #   (Hint: look at the distribution of raw values for a sample of proteins.)
 library(ggplot2)
 library(dplyr)
+library(gridExtra)
 
 biomarker_raw <- read.csv('data/biomarker-raw.csv')
 biomarker_raw
@@ -56,12 +57,7 @@ p62 <- ggplot(biomarker_num, aes(x = log(Semaphorin.5A))) +
 p72 <- ggplot(biomarker_num, aes(x = log(Protein.S100.A6))) +
   geom_histogram(bins = 15)
 
-
-# install.packages("gridExtra")
-library(gridExtra)
-
-
-
+# plot untransformed and transformed histograms side by side
 grid.arrange(p11, p12,  ncol = 2)
 grid.arrange(p21, p22,  ncol = 2)
 grid.arrange(p31, p32,  ncol = 2)
