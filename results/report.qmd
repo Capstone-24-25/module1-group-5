@@ -56,7 +56,7 @@ classDef default scale:1;
   D --> E[Union the Candidates]
   E --> F[Elastic Net Logistic Regression<br>Recursive Feature Elimination]
   F --> G[Final 6-Protein Panel]
-  G --> H(L1 Logistic Regression<br>Consturct Final Model for Testing)
+  G --> H(L1 Logistic Regression<br>Construct Final Model for Testing)
 ```
 :::
 
