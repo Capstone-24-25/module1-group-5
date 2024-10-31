@@ -1,7 +1,7 @@
 ---
 title: "Biomarkers of ASD"
-subtitle: "If you want a subtitle put it here"
-author: "List names here"
+subtitle: ""
+author: "Tess Ivinjack, Joshua Charfauros, Jaxon Zhang, Wentao (Eric) Zhang"
 date: last-modified
 published-title: "Updated"
 editor: visual
@@ -14,37 +14,308 @@ execute:
   cache: true
 ---
 
-Use this as a template. Keep the headers and remove all other text. In all, your report can be quite short. When it is complete, render and then push changes to your team repository.
+*Uncomment the line in the source code to download python modules and set up virtual environment if necessary*
 
 ```{r}
 # load any other packages and read data here
 library(tidyverse)
+library(reticulate)
+library(ggplot2)
+library(dplyr)
+library(gridExtra)
+library(readr)
+
+# uncomment the line to download python modules
+# py_install(c('pandas', 'numpy', 'scikit-learn', 'matplotlib', 'jupyter'))
 ```
 
 ## Abstract
 
-Write a brief one-paragraph abstract that describes the contents of your write-up.
+Included in our write up is a description of our dataset, a summary of our general analysis followed by a detailed description of each step with accompanied illustrations, several bar graphs demonstrating the usefulness of log transforms, an analysis of outliers, and our final protein panel of 6 biomarkers.
 
 ## Dataset
 
-Write a brief data description, including: how data were obtained; sample characteristics; variables measured; and data preprocessing. This can be largely based on the source paper and should not exceed 1-2 paragraphs.
+This data contains information on whether or not boys from the age of 18 months to 8 years have Autism Spectrum Disorder (ASD) and their protein serum samples. There were a total 154 boys measured through blood collection and SomaLogic analysis, with 76 being diagnosed with ASD and 78 in the typically developing (TD) group. The mean ages for these groups were 5.6 and 5.7 years respectively with standard deviations of 1.7 and 2.0 years. There were 73 Caucasian, 32 Hispanic/Latino, 17 African American/Black, 5 Asian or Pacific Islander, 23 multiple ethnicities or other, and 4 not reported subjects in the dataset. Comorbidities were measured and it was found that 75.3% of TD boys and 52.8% of ASD boys had no comorbidities and the next most common was seasonal allergies which 41.7% of ASD boys had and 22.4% of TD boys had. In addition, the ASD group underwent assessment from a clinical psychologist to obtain an Autism Diagnostic Observation Schedule (ADOS) score, which provides a continuous measure of overall ASD symptom severity. A total of 1,317 proteins were measured, but 192 failed the quality control test so 1,125 proteins were analyzed. Of the 1,125 proteins, that data was normalized by taking a log 10 transform and then a z-transformation. For more preprocessing, to deal with outliers, any z-transformed values outside the range of -3 to 3 were clipped to -3 and 3, respectively.
 
 ## Summary of published analysis
 
-Summarize the methodology of the paper in 1-3 paragraphs. You need not explain the methods in depth as we did in class; just indicate what methods were used and how they were combined. If possible, include a diagram that depicts the methodological design. (Quarto has support for [GraphViz and Mermaid flowcharts](https://quarto.org/docs/authoring/diagrams.html).) Provide key results: the proteins selected for the classifier and the estimated accuracy.
+This paper used many different methods to obtain the final protein panel for ASD prediction. After data collection, there was data preprocessing, which included log transforming, z-transforming, and then elimination of outliers. Once the data was ready to be modeled, there were three methods used: random forest, t-test, and correlation-based methods. First, random forest employed a decision tree based learning method that measures feature importance and then ultimately selects the 10 proteins with the highest averaged importance values. Next, they ran t-tests, which is a test to distinguish how significant the difference is between the means of two groups, to select the 10 proteins that had the most significant t-test values. Finally, they measures the correlation, or strength of statistical relationship, between each protein and the total ADOS scores to once again, produce the top 10 most highly correlated proteins.
+
+After using these three methodologies, there were five proteins common to each method used, which were considered the 'core' proteins. To determine if any of the other 13 proteins should also be included in the final panel, there was a logistic regression model trained on the 5 core proteins. After testing out each additional protein to see if they added any predictive power to the model, it was found that four more proteins should be added to the final panel of 'optimal' proteins. The AUC for the top 10 proteins identified by each model was: RF = 0.839±0.066, t-test = 0.837±0.066 and ADOS correlation = 0.853±0.066. When combining the five 'core' proteins with the other four proteins for our 'optimal' proteins gave us an AUC = 0.860±0.064, with a sensitivity = 0.833±0.118, and specificity = 0.846±0.118. The workflow of the paper can be found in the chart below.
+
+::: {style="display: flex; justify-content: center;"}
+```{mermaid}
+flowchart TB
+classDef default scale:1;
+  A[Original Cleaned Sample] --> B[Correlation Feature Selection]
+  B --> C[L1 Logistic Regression<br>Recursive Feature Elimination]
+  B --> D[Random Forest<br>5 Folds Cross Validation]
+  C --> E[Union the Candidates]
+  D --> E[Union the Candidates]
+  E --> F[Elastic Net Logistic Regression<br>Recursive Feature Elimination]
+  F --> G[Final 6-Protein Panel]
+  G --> H(L1 Logistic Regression<br>Construct Final Model for Testing)
+```
+:::
 
 ## Findings
 
-Summarize your findings here. I've included some subheaders in a way that seems natural to me; you can structure this section however you like.
-
 ### Impact of preprocessing and outliers
 
-Tasks 1-2
+```{r}
+biomarker_raw <- read.csv('../data/biomarker-raw.csv')
+biomarker_num <- biomarker_raw[-1,]
+biomarker_num <- biomarker_num %>% mutate_all(~ as.numeric(as.character(.)))
+
+p11 <- ggplot(biomarker_num, aes(x = Gamma.enolase)) +
+  geom_histogram(bins = 15)
+p21 <- ggplot(biomarker_num, aes(x = E3.ubiquitin.protein.ligase.CHIP)) +
+  geom_histogram(bins = 10)
+p31 <- ggplot(biomarker_num, aes(x = CCAAT.enhancer.binding.protein.beta)) +
+  geom_histogram(bins = 15)
+p41 <- ggplot(biomarker_num, aes(x = Vitronectin)) +
+  geom_histogram(bins = 20)
+p51 <- ggplot(biomarker_num, aes(x = Histone.H3.1)) +
+  geom_histogram(bins = 15)
+p61 <- ggplot(biomarker_num, aes(x = Semaphorin.5A)) +
+  geom_histogram(bins = 20)
+p71 <- ggplot(biomarker_num, aes(x = Protein.S100.A6)) +
+  geom_histogram(bins = 15)
+
+p12 <- ggplot(biomarker_num, aes(x = log(Gamma.enolase))) +
+  geom_histogram(bins = 15)
+p22 <- ggplot(biomarker_num, aes(x = log(E3.ubiquitin.protein.ligase.CHIP))) +
+  geom_histogram(bins = 10)
+p32 <- ggplot(biomarker_num, aes(x = log(CCAAT.enhancer.binding.protein.beta))) +
+  geom_histogram(bins = 15)
+p42 <- ggplot(biomarker_num, aes(x = log(Vitronectin))) +
+  geom_histogram(bins = 20)
+p52 <- ggplot(biomarker_num, aes(x = log(Histone.H3.1))) +
+  geom_histogram(bins = 15)
+p62 <- ggplot(biomarker_num, aes(x = log(Semaphorin.5A))) +
+  geom_histogram(bins = 20)
+p72 <- ggplot(biomarker_num, aes(x = log(Protein.S100.A6))) +
+  geom_histogram(bins = 15)
+
+grid.arrange(p11, p12,  ncol = 2)
+grid.arrange(p21, p22,  ncol = 2)
+grid.arrange(p31, p32,  ncol = 2)
+grid.arrange(p41, p42,  ncol = 2)
+grid.arrange(p51, p52,  ncol = 2)
+grid.arrange(p61, p62,  ncol = 2)
+grid.arrange(p71, p72,  ncol = 2)
+```
+
+To begin with the preprocessing of the data, we first look at the raw proteins to see how they are distributed. From observing the distribution of a sample of the proteins from the raw file, it is clear that many of them have skewed distributions. These skewed distributions could be due to high variability in the protein levels which leads to outliers that are affecting our data and predictions. To improve our model and predictions, we can log transform the proteins to help normalize the distributions. By doing this, it helps to improve our models performance since machine learning techniques like random forest will give you better predictions when the input data is more normally distributed. As we can observe from the difference in the raw and the log transformed histograms for this sample of proteins, the transformation helps to normalize the distributions of the raw proteins in our dataset.
+
+```{r}
+var_names <- read_csv('../data/biomarker-raw.csv', # prevent interpreting the first row as header 
+                      n_max = 2, # read only 2 rows
+                      col_names = F,  # exclude first two columns
+                      col_select = -(1:2) ) %>%  # switching rows and columns
+  t() %>% as_tibble() %>% 
+  rename( name = V1, abbreviation = V2 ) %>% # name, abbreviate are the new name. V1, V2 are the the default old names
+  na.omit()
+```
+
+#### Read in data
+
+```{r}
+biomarker_clean <- read_csv("../data/biomarker-raw.csv",
+                            skip = 2,
+                            col_select = -2L,
+                            col_names = c(
+                              "group",
+                              "empty",
+                              pull(var_names, abbreviation),
+                              "ados"
+                            ),
+                            # Treat '-' and '' as NA.
+                            na = c("-", "")
+) %>%
+  filter(!is.na(group)) %>%
+  mutate(across(
+    .cols = -c(group, ados),
+    ~ scale(log10(.x))[, 1]
+  )) %>%
+  select(group, ados, everything())
+
+outlier_threshold <- 3 
+outlier_df <- biomarker_clean %>%
+  mutate(across(
+    .cols = -c(group, ados),  
+    ~ ifelse(abs(.) > outlier_threshold, ., NA) 
+  ))
+
+outlier_summary <- outlier_df %>%
+  select(group, ados, everything()) %>%
+  pivot_longer(-c(group, ados), names_to = "biomarker", values_to = "value") %>%
+  filter(!is.na(value)) %>%  # Keep only outliers
+  group_by(group, ados, biomarker) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  filter(count > 2)
+
+outlier_summary
+```
+
+If we examine the `outlier_summary` table above, it shows us the biomarkers that have an outlier point as well as the group and ADOS score for the subject that corresponds to that outlier point. Overall, there are 1822 biomarkers which have at least 1 outlying point. Attempting to identify individual subjects we can filter to only see biomarkers which have an outlier count of 1. Doing this, we see ADOS values ranging from 6-23 as well as NA. Each of these 18 unique ADOS values likely correspond to an individual outlying subject that has many outlying biomarkers. There are 449 outlying biomarkers which correspond to a subject which is typically developing, while there are 922 biomarkers which correspond to a subject which is autistic. With this, we can conclude that it's more likely for an autistic subject to be an outlier subject than it is for those which are typically developing.
 
 ### Methodlogical variations
 
-Task 3
+#### L1 logistic regression - Recursive Feature Elimination
+
+Logistic Regression is used for the second round of selection. The L1 Lasso Regularization is used to select the bio-markers from the total 1194 bio-markers (after dropping the bio-markers with high correlation). L1 Regularization penalizes the features with the least absolute coefficients, or weights, in the logit, and eventually drives them to zero. Those ones are bio-markers that are considered to be less important. We select total 20 candidates with the highest rank. Top ten bio-markers are plotted for neat visualization purpose.
+
+```{python L1 logistic regression - Recursive Feature Elimination}
+import pickle
+from matplotlib import pyplot as plt
+import pandas as pd
+import numpy as np
+
+with open('../data/q4_variables.pkl', 'rb') as f:
+  q4_variables = pickle.load(f)
+  
+biomarker_rfe_top10_x = q4_variables['biomarker_rfe_top10_x'] 
+biomarker_rfe_top10_y =  q4_variables['biomarker_rfe_top10_y']
+biomarker_rfe_top10_names = q4_variables['biomarker_rfe_top10_names']
+offset_index = q4_variables['offset_index']
+x_axis = q4_variables['x_axis']
+y_axis = q4_variables['y_axis']
+
+fig, ax = plt.subplots(figsize=[10, 6]);
+plt.scatter(x=x_axis, y=y_axis, s=1);
+
+for x, y, name, idx in zip(biomarker_rfe_top10_x, biomarker_rfe_top10_y, biomarker_rfe_top10_names, offset_index):
+  ax.scatter(biomarker_rfe_top10_x, biomarker_rfe_top10_y, c='red', s=1);
+
+  offset_x = 40 if idx <= 10 else None
+  offset_y = (idx % 10) * 12 + 50
+
+  ax.annotate(
+    f'{name}' if idx <= 10 else None,
+    (x, y),
+    textcoords='offset points',
+    xytext=(offset_x, offset_y),
+    fontsize=6,
+    ha='center',
+    color='black',
+    bbox=dict(boxstyle='round,pad=0.3', edgecolor='black', facecolor='white', alpha=0.5) if idx <= 10 else None,
+    arrowprops=dict(arrowstyle='-', color='grey', linewidth=0.5) if idx <= 10 else None
+  )
+
+ax.set_xticks(ticks=());
+ax.set_xlabel('Protein');
+ax.set_ylabel('Ranks (Feature Importance)');
+ax.set_title('Recursive Feature Elimination - L1 Logistic Regression')
+  
+plt.show();
+```
+
+#### Random Forest - 5 folds Cross Validation
+
+Random forest Algorithm is applied for the third round of selection. The Gini Importance, or the mean decrease in impurity, is used as the metric to determine the contribution of each bio-marker in predicting the outcome. The feature importance for each feature is computed by averaging the total impurity decrease across all the trees in the forest where the feature is used. Another 20 bio-markers are identified as candidates for final selection. The plot demonstrated the top 10 bio-markers which have the highest log average feature importance.
+
+We then union two sets of candidates to serve as the pool of our final selection.
+
+```{python}
+import pickle
+from matplotlib import pyplot as plt
+import pandas as pd
+import numpy as np
+
+with open('../data/q4_variables.pkl', 'rb') as f:
+  q4_variables = pickle.load(f)
+  
+label_x = q4_variables['label_x']
+label_y = q4_variables['label_y']
+offsets_1 = q4_variables['offsets_1']
+biomarker_name = q4_variables['biomarker_name']
+fi_rf_sorted = q4_variables['fi_rf_sorted']
+
+fig, ax = plt.subplots(figsize=[10, 6])
+ax.scatter(x=range(1194), y=fi_rf_sorted, s=1, alpha=0.8);
+
+for x, y, name, idx in zip(label_x, label_y, biomarker_name, offsets_1):
+  offset_x = -60 if idx >= 10 else 0  # Labels for first 10 points to the left, next 10 to the right
+  offset_y = (idx % 10) * 10 - 90     # Stagger labels vertically to prevent overlap
+
+  ax.scatter(x, y, c='red', s=1);
+  ax.annotate(
+    f'{name}' if idx >= 10 else None,
+    (x, y),
+    textcoords='offset points',
+    xytext=(offset_x, offset_y),
+    ha='center',
+    fontsize=6,
+    color='black',
+    bbox=dict(boxstyle='round,pad=0.3', edgecolor='black', facecolor='white', linewidth=0.5, alpha=0.5),
+    arrowprops=dict(arrowstyle="-", color='gray', lw=0.5) if idx >= 10 else None
+  )
+
+ax.set_xticks(ticks=());
+ax.set_xlabel('Proteins')
+ax.set_ylabel('log Average of 5 folds Feature Importance')
+ax.set_title('Feature Importance of Random Forest - 5 Folds CV')
+
+plt.show();
+```
+
+#### Elastic Net Logistic Regression - Recursive Feature Elimination
+
+50% of L1 regularization and 50% of L2 regularization is applied on the Elastic Net Logistic Regression to recursively select bio-markers with each step, finding a 6 bio-markers protein panel which has the best predictive power. While L1 penalization shrinks the least absolute value of coefficients to zero, L2 handles the multicollinearity by distributing importance across correlated features.
 
 ### Improved classifier
 
-Task 4
+Our goal is to find a protein panel that can best predict if levels of expression of them can be used to predict if a person has Autism.
+
+General Steps:
+
+-   Remove the bio-marker that is highly correlated with each other with the threshold `> 0.9`.
+
+-   Apply backwards selection using L1 logistic regression to select top 20 features based on feature importance.
+
+-   Apply random forest with 5 folds cross validation to select top 20 features based on the average feature importance
+
+-   Union the 40 features to use them as the base model, apply backwards selection using elastic net logistic regression (50% L1 and 50% L2) to select a protein panel with 9 bio-markers
+
+-   Fit the final model using L1 logistic regression of 6 bio-markers and achieve the ROC-AUC value of 87.29%
+
+The final protein panel is made of 6 bio-markers showed below:
+
+```{python print results}
+with open('../data/q4_variables.pkl', 'rb') as f:
+  q4_variables = pickle.load(f)
+  
+protein_panel_name = q4_variables['protein_panel_name']
+
+panel = ''
+for biomarker in protein_panel_name:
+  panel += biomarker + ', '
+
+print(panel[:-3])
+```
+
+We use the ROC-AUC metric for testing. Our approach simplifies the original 9-biomarkers panel to 6 while yielding a comparable predictive power. It can be interpreted as that the possibility of ranking a randomly chosen ASD patient higher than the possibility of ranking a randomly chosen TD patient.
+
+The confusion matrix is plotted below
+
+```{python confusion matrix}
+import pickle
+from matplotlib import pyplot as plt
+import numpy as np
+
+with open('../data/q4_variables.pkl', 'rb') as f:
+  q4_variables = pickle.load(f)
+
+cm = np.loadtxt('../data/confusion_matrix.csv', delimiter=',')
+fig, ax = plt.subplots(figsize=[8, 8]);
+ax.imshow(cm, cmap="Blues");
+ax.xaxis.set(ticks=(0, 1), ticklabels=('Predicted TD', 'Predicted ASD'));
+ax.yaxis.set(ticks=(0, 1), ticklabels=('Actual TD', 'Actual ASD'));
+for i in range(2):
+  for j in range(2):
+    ax.text(j, i, cm[i, j], ha='center', va='center', color='black', fontdict={'fontsize': 20});
+ax.grid(False);
+ax.set_title('Confusion Matrix of Final Predictions');
+plt.show();
+```
