@@ -14,7 +14,7 @@ execute:
   cache: true
 ---
 
-**Uncomment the line in the source code to download python modules and set up virtual environment if necessary**
+*Uncomment the line in the source code to download python modules and set up virtual environment if necessary*
 
 ```{r}
 # load any other packages and read data here
@@ -38,8 +38,6 @@ Included in our write up is a description of our dataset, a summary of our gener
 This data contains information on whether or not boys from the age of 18 months to 8 years have Autism Spectrum Disorder (ASD) and their protein serum samples. There were a total 154 boys measured through blood collection and SomaLogic analysis, with 76 being diagnosed with ASD and 78 in the typically developing (TD) group. The mean ages for these groups were 5.6 and 5.7 years respectively with standard deviations of 1.7 and 2.0 years. There were 73 Caucasian, 32 Hispanic/Latino, 17 African American/Black, 5 Asian or Pacific Islander, 23 multiple ethnicities or other, and 4 not reported subjects in the dataset. Comorbidities were measured and it was found that 75.3% of TD boys and 52.8% of ASD boys had no comorbidities and the next most common was seasonal allergies which 41.7% of ASD boys had and 22.4% of TD boys had. In addition, the ASD group underwent assessment from a clinical psychologist to obtain an Autism Diagnostic Observation Schedule (ADOS) score, which provides a continuous measure of overall ASD symptom severity. A total of 1,317 proteins were measured, but 192 failed the quality control test so 1,125 proteins were analyzed. Of the 1,125 proteins, that data was normalized by taking a log 10 transform and then a z-transformation. For more preprocessing, to deal with outliers, any z-transformed values outside the range of -3 to 3 were clipped to -3 and 3, respectively.
 
 ## Summary of published analysis
-
-<!-- Summarize the methodology of the paper in 1-3 paragraphs. You need not explain the methods in depth as we did in class; just indicate what methods were used and how they were combined. If possible, include a diagram that depicts the methodological design. (Quarto has support for [GraphViz and Mermaid flowcharts](https://quarto.org/docs/authoring/diagrams.html).) Provide key results: the proteins selected for the classifier and the estimated accuracy. -->
 
 This paper used many different methods to obtain the final protein panel for ASD prediction. After data collection, there was data preprocessing, which included log transforming, z-transforming, and then elimination of outliers. Once the data was ready to be modeled, there were three methods used: random forest, t-test, and correlation-based methods. First, random forest employed a decision tree based learning method that measures feature importance and then ultimately selects the 10 proteins with the highest averaged importance values. Next, they ran t-tests, which is a test to distinguish how significant the difference is between the means of two groups, to select the 10 proteins that had the most significant t-test values. Finally, they measures the correlation, or strength of statistical relationship, between each protein and the total ADOS scores to once again, produce the top 10 most highly correlated proteins.
 
@@ -160,7 +158,7 @@ outlier_summary <- outlier_df %>%
 view(outlier_summary)
 ```
 
-If we examine the outlier_summary table, it shows us the biomarkers that have an outlier point as well as the group and ados score for the subject that corresponds to that outlier point. Overall, there are 1822 biomarkers which have at least 1 outlying point. Attempting to identify individual subjects we can filter to only see biomarkers which have an outlier count of 1. Doing this, we see ados values ranging from 6-23 as well as NA. Each of these 18 unique ados values likely correspond to an individual outlying subject that has many outlying biomarkers. There are 449 outlying biomarkers which correspond to a subject which is typically developing, while there are 922 biomarkers which correspond to a subject which is autistic. With this, we can conclude that it's more likely for an autistic subject to be an outlier subject than it is for those which are typically developing.
+If we examine the `outlier_summary` table, it shows us the biomarkers that have an outlier point as well as the group and ADOS score for the subject that corresponds to that outlier point. Overall, there are 1822 biomarkers which have at least 1 outlying point. Attempting to identify individual subjects we can filter to only see biomarkers which have an outlier count of 1. Doing this, we see ADOS values ranging from 6-23 as well as NA. Each of these 18 unique ADOS values likely correspond to an individual outlying subject that has many outlying biomarkers. There are 449 outlying biomarkers which correspond to a subject which is typically developing, while there are 922 biomarkers which correspond to a subject which is autistic. With this, we can conclude that it's more likely for an autistic subject to be an outlier subject than it is for those which are typically developing.
 
 ### Methodlogical variations
 
