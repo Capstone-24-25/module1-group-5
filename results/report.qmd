@@ -155,10 +155,10 @@ outlier_summary <- outlier_df %>%
   summarise(count = n(), .groups = "drop") %>%
   filter(count > 2)
 
-view(outlier_summary)
+outlier_summary
 ```
 
-If we examine the `outlier_summary` table, it shows us the biomarkers that have an outlier point as well as the group and ADOS score for the subject that corresponds to that outlier point. Overall, there are 1822 biomarkers which have at least 1 outlying point. Attempting to identify individual subjects we can filter to only see biomarkers which have an outlier count of 1. Doing this, we see ADOS values ranging from 6-23 as well as NA. Each of these 18 unique ADOS values likely correspond to an individual outlying subject that has many outlying biomarkers. There are 449 outlying biomarkers which correspond to a subject which is typically developing, while there are 922 biomarkers which correspond to a subject which is autistic. With this, we can conclude that it's more likely for an autistic subject to be an outlier subject than it is for those which are typically developing.
+If we examine the `outlier_summary` table above, it shows us the biomarkers that have an outlier point as well as the group and ADOS score for the subject that corresponds to that outlier point. Overall, there are 1822 biomarkers which have at least 1 outlying point. Attempting to identify individual subjects we can filter to only see biomarkers which have an outlier count of 1. Doing this, we see ADOS values ranging from 6-23 as well as NA. Each of these 18 unique ADOS values likely correspond to an individual outlying subject that has many outlying biomarkers. There are 449 outlying biomarkers which correspond to a subject which is typically developing, while there are 922 biomarkers which correspond to a subject which is autistic. With this, we can conclude that it's more likely for an autistic subject to be an outlier subject than it is for those which are typically developing.
 
 ### Methodlogical variations
 

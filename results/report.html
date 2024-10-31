@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -75,9 +75,7 @@ ul.task-list li input[type="checkbox"] {
   </div>
   
 
-
 </header>
-
 
 <p><em>Uncomment the line in the source code to download python modules and set up virtual environment if necessary</em></p>
 <section id="abstract" class="level2">
@@ -93,10 +91,9 @@ ul.task-list li input[type="checkbox"] {
 <p>This paper used many different methods to obtain the final protein panel for ASD prediction. After data collection, there was data preprocessing, which included log transforming, z-transforming, and then elimination of outliers. Once the data was ready to be modeled, there were three methods used: random forest, t-test, and correlation-based methods. First, random forest employed a decision tree based learning method that measures feature importance and then ultimately selects the 10 proteins with the highest averaged importance values. Next, they ran t-tests, which is a test to distinguish how significant the difference is between the means of two groups, to select the 10 proteins that had the most significant t-test values. Finally, they measures the correlation, or strength of statistical relationship, between each protein and the total ADOS scores to once again, produce the top 10 most highly correlated proteins.</p>
 <p>After using these three methodologies, there were five proteins common to each method used, which were considered the ‘core’ proteins. To determine if any of the other 13 proteins should also be included in the final panel, there was a logistic regression model trained on the 5 core proteins. After testing out each additional protein to see if they added any predictive power to the model, it was found that four more proteins should be added to the final panel of ‘optimal’ proteins. The AUC for the top 10 proteins identified by each model was: RF = 0.839±0.066, t-test = 0.837±0.066 and ADOS correlation = 0.853±0.066. When combining the five ‘core’ proteins with the other four proteins for our ‘optimal’ proteins gave us an AUC = 0.860±0.064, with a sensitivity = 0.833±0.118, and specificity = 0.846±0.118. The workflow of the paper can be found in the chart below.</p>
 <div style="display: flex; justify-content: center;">
-<div class="cell" data-layout-align="default">
+<div class="cell">
 <div class="cell-output-display">
 <div>
-<p></p><figure class="figure"><p></p>
 <div>
 <pre class="mermaid mermaid-js">flowchart TB
 classDef default scale:1;
@@ -110,7 +107,6 @@ classDef default scale:1;
   G --&gt; H(L1 Logistic Regression&lt;br&gt;Construct Final Model for Testing)
 </pre>
 </div>
-<p></p></figure><p></p>
 </div>
 </div>
 </div>
@@ -120,61 +116,51 @@ classDef default scale:1;
 <h2 class="anchored" data-anchor-id="findings">Findings</h2>
 <section id="impact-of-preprocessing-and-outliers" class="level3">
 <h3 class="anchored" data-anchor-id="impact-of-preprocessing-and-outliers">Impact of preprocessing and outliers</h3>
-<div class="cell">
+<div class="cell" data-hash="report_cache/html/unnamed-chunk-3_84943969e2cb8bf6efeeccefea20fde2">
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="report_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
+<p><img src="report_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="report_files/figure-html/unnamed-chunk-3-2.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
+<p><img src="report_files/figure-html/unnamed-chunk-3-2.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="report_files/figure-html/unnamed-chunk-3-3.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
+<p><img src="report_files/figure-html/unnamed-chunk-3-3.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="report_files/figure-html/unnamed-chunk-3-4.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
+<p><img src="report_files/figure-html/unnamed-chunk-3-4.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="report_files/figure-html/unnamed-chunk-3-5.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
+<p><img src="report_files/figure-html/unnamed-chunk-3-5.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="report_files/figure-html/unnamed-chunk-3-6.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
+<p><img src="report_files/figure-html/unnamed-chunk-3-6.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="report_files/figure-html/unnamed-chunk-3-7.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
+<p><img src="report_files/figure-html/unnamed-chunk-3-7.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>To begin with the preprocessing of the data, we first look at the raw proteins to see how they are distributed. From observing the distribution of a sample of the proteins from the raw file, it is clear that many of them have skewed distributions. These skewed distributions could be due to high variability in the protein levels which leads to outliers that are affecting our data and predictions. To improve our model and predictions, we can log transform the proteins to help normalize the distributions. By doing this, it helps to improve our models performance since machine learning techniques like random forest will give you better predictions when the input data is more normally distributed. As we can observe from the difference in the raw and the log transformed histograms for this sample of proteins, the transformation helps to normalize the distributions of the raw proteins in our dataset.</p>
 <section id="read-in-data" class="level4">
 <h4 class="anchored" data-anchor-id="read-in-data">Read in data</h4>
-<p>If we examine the <code>outlier_summary</code> table, it shows us the biomarkers that have an outlier point as well as the group and ADOS score for the subject that corresponds to that outlier point. Overall, there are 1822 biomarkers which have at least 1 outlying point. Attempting to identify individual subjects we can filter to only see biomarkers which have an outlier count of 1. Doing this, we see ADOS values ranging from 6-23 as well as NA. Each of these 18 unique ADOS values likely correspond to an individual outlying subject that has many outlying biomarkers. There are 449 outlying biomarkers which correspond to a subject which is typically developing, while there are 922 biomarkers which correspond to a subject which is autistic. With this, we can conclude that it’s more likely for an autistic subject to be an outlier subject than it is for those which are typically developing.</p>
+<div class="cell" data-hash="report_cache/html/unnamed-chunk-5_34b206e5e563dd529ae080011f593be6">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 91 × 4
+   group  ados biomarker   count
+   &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;       &lt;int&gt;
+ 1 ASD       7 LBP             3
+ 2 ASD      12 IL-12 RB2       3
+ 3 ASD      22 GM-CSF          3
+ 4 TD       NA AFP             3
+ 5 TD       NA AMNLS           4
+ 6 TD       NA AMPK a2b2g1     3
+ 7 TD       NA ANK2            3
+ 8 TD       NA B7-H1           4
+ 9 TD       NA BAD             3
+10 TD       NA BMPER           3
+# ℹ 81 more rows</code></pre>
+</div>
+</div>
+<p>If we examine the <code>outlier_summary</code> table above, it shows us the biomarkers that have an outlier point as well as the group and ADOS score for the subject that corresponds to that outlier point. Overall, there are 1822 biomarkers which have at least 1 outlying point. Attempting to identify individual subjects we can filter to only see biomarkers which have an outlier count of 1. Doing this, we see ADOS values ranging from 6-23 as well as NA. Each of these 18 unique ADOS values likely correspond to an individual outlying subject that has many outlying biomarkers. There are 449 outlying biomarkers which correspond to a subject which is typically developing, while there are 922 biomarkers which correspond to a subject which is autistic. With this, we can conclude that it’s more likely for an autistic subject to be an outlier subject than it is for those which are typically developing.</p>
 </section>
 </section>
 <section id="methodlogical-variations" class="level3">
@@ -182,13 +168,9 @@ classDef default scale:1;
 <section id="l1-logistic-regression---recursive-feature-elimination" class="level4">
 <h4 class="anchored" data-anchor-id="l1-logistic-regression---recursive-feature-elimination">L1 logistic regression - Recursive Feature Elimination</h4>
 <p>Logistic Regression is used for the second round of selection. The L1 Lasso Regularization is used to select the bio-markers from the total 1194 bio-markers (after dropping the bio-markers with high correlation). L1 Regularization penalizes the features with the least absolute coefficients, or weights, in the logit, and eventually drives them to zero. Those ones are bio-markers that are considered to be less important. We select total 20 candidates with the highest rank. Top ten bio-markers are plotted for neat visualization purpose.</p>
-<div class="cell">
+<div class="cell" data-hash="report_cache/html/L1 logistic regression - Recursive Feature Elimination_8e2cf894f6f451751464208da639933e">
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="report_files/figure-html/L1%20logistic%20regression%20-%20Recursive%20Feature%20Elimination-1.png" class="img-fluid figure-img" width="960"></p>
-</figure>
-</div>
+<p><img src="report_files/figure-html/L1%20logistic%20regression%20-%20Recursive%20Feature%20Elimination-1.png" class="img-fluid" width="960"></p>
 </div>
 </div>
 </section>
@@ -196,13 +178,9 @@ classDef default scale:1;
 <h4 class="anchored" data-anchor-id="random-forest---5-folds-cross-validation">Random Forest - 5 folds Cross Validation</h4>
 <p>Random forest Algorithm is applied for the third round of selection. The Gini Importance, or the mean decrease in impurity, is used as the metric to determine the contribution of each bio-marker in predicting the outcome. The feature importance for each feature is computed by averaging the total impurity decrease across all the trees in the forest where the feature is used. Another 20 bio-markers are identified as candidates for final selection. The plot demonstrated the top 10 bio-markers which have the highest log average feature importance.</p>
 <p>We then union two sets of candidates to serve as the pool of our final selection.</p>
-<div class="cell">
+<div class="cell" data-hash="report_cache/html/unnamed-chunk-6_cb386f6559910633f2217b1d604ebbd1">
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="report_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="960"></p>
-</figure>
-</div>
+<p><img src="report_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="960"></p>
 </div>
 </div>
 </section>
@@ -223,20 +201,16 @@ classDef default scale:1;
 <li><p>Fit the final model using L1 logistic regression of 6 bio-markers and achieve the ROC-AUC value of 87.29%</p></li>
 </ul>
 <p>The final protein panel is made of 6 bio-markers showed below:</p>
-<div class="cell">
+<div class="cell" data-hash="report_cache/html/print results_34f2085bf9e8ca8e51f6374671dbd129">
 <div class="cell-output cell-output-stdout">
 <pre><code>IL-17 RC, SRCN1, IgD, FSTL1, IL-6 sRa, Coagulation Factor I</code></pre>
 </div>
 </div>
 <p>We use the ROC-AUC metric for testing. Our approach simplifies the original 9-biomarkers panel to 6 while yielding a comparable predictive power. It can be interpreted as that the possibility of ranking a randomly chosen ASD patient higher than the possibility of ranking a randomly chosen TD patient.</p>
 <p>The confusion matrix is plotted below</p>
-<div class="cell">
+<div class="cell" data-hash="report_cache/html/confusion matrix_a34908eacef781f7024ea5cba2938b3d">
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="report_files/figure-html/confusion%20matrix-3.png" class="img-fluid figure-img" width="768"></p>
-</figure>
-</div>
+<p><img src="report_files/figure-html/confusion%20matrix-1.png" class="img-fluid" width="768"></p>
 </div>
 </div>
 </section>
@@ -279,7 +253,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const onCopySuccess = function(e) {
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -311,50 +296,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
-  }
-  const getTextToCopy = function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-    text: getTextToCopy
   });
-  clipboard.on('success', onCopySuccess);
-  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
-    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-      text: getTextToCopy,
-      container: window.document.getElementById('quarto-embedded-source-code-modal')
-    });
-    clipboardModal.on('success', onCopySuccess);
-  }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
-      }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+  function tippyHover(el, contentFn) {
     const config = {
       allowHTML: true,
+      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -364,17 +310,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start',
+      placement: 'bottom-start'
     };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -386,130 +323,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
-        }
-      }
-    }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
-          } else {
-            container.appendChild(child.cloneNode(true));
-            break;
-          }
-        }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
-        }
-        return container.innerHTML
-      } else {
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(note);
-        }
-        return note.innerHTML;
-      }
-    } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      // TODO in 1.5, we should make sure this works without a callout special case
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
-      }
-    }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
-          }
-        } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
-          .then(res => res.text())
-          .then(html => {
-            const parser = new DOMParser();
-            const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
-            if (note !== null) {
-              const html = processXRef(id, note);
-              instance.setContent(html);
-            } 
-          }).finally(() => {
-            instance.enable();
-            instance.show();
-          });
-        }
-      } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
-          if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
+      return note.innerHTML;
     });
   }
       let selectedAnnoteEl;
@@ -553,7 +367,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
-            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -579,32 +392,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -665,7 +452,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
-
 
 
 
