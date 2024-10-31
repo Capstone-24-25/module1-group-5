@@ -1,7 +1,7 @@
 ---
 title: "Biomarkers of ASD"
 subtitle: ""
-author: "Tess Ivinjack, Josh Charfauros, Jaxon Zhang, Wentao (Eric) Zhang"
+author: "Tess Ivinjack, Joshua Charfauros, Jaxon Zhang, Wentao (Eric) Zhang"
 date: last-modified
 published-title: "Updated"
 editor: visual
@@ -31,7 +31,7 @@ library(readr)
 
 ## Abstract
 
-Write a brief one-paragraph abstract that describes the contents of your write-up.
+Included in our write up is a description of our dataset, a summary of our general analysis followed by a detailed description of each step with accompanied illustrations, several bar graphs demonstrating the usefulness of log transforms, an analysis of outliers, and our final protein panel of 6 biomarkers. 
 
 ## Dataset
 
