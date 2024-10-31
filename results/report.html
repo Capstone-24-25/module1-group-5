@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="List names here">
+<meta name="author" content="Tess Ivinjack, Joshua Charfauros, Jaxon Zhang, Wentao (Eric) Zhang">
 <meta name="dcterms.date" content="2024-10-30">
 
 <title>Biomarkers of ASD</title>
@@ -51,7 +51,6 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Biomarkers of ASD</h1>
-<p class="subtitle lead">If you want a subtitle put it here</p>
 </div>
 
 
@@ -61,7 +60,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>List names here </p>
+             <p>Tess Ivinjack, Joshua Charfauros, Jaxon Zhang, Wentao (Eric) Zhang </p>
           </div>
   </div>
     
@@ -81,7 +80,7 @@ ul.task-list li input[type="checkbox"] {
 <p><strong>Uncomment the line in the source code to download python modules and set up virtual environment if necessary</strong></p>
 <section id="abstract" class="level2">
 <h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
-<p>Write a brief one-paragraph abstract that describes the contents of your write-up.</p>
+<p>Included in our write up is a description of our dataset, a summary of our general analysis followed by a detailed description of each step with accompanied illustrations, several bar graphs demonstrating the usefulness of log transforms, an analysis of outliers, and our final protein panel of 6 biomarkers.</p>
 </section>
 <section id="dataset" class="level2">
 <h2 class="anchored" data-anchor-id="dataset">Dataset</h2>
@@ -90,15 +89,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="summary-of-published-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="summary-of-published-analysis">Summary of published analysis</h2>
 <!-- Summarize the methodology of the paper in 1-3 paragraphs. You need not explain the methods in depth as we did in class; just indicate what methods were used and how they were combined. If possible, include a diagram that depicts the methodological design. (Quarto has support for [GraphViz and Mermaid flowcharts](https://quarto.org/docs/authoring/diagrams.html).) Provide key results: the proteins selected for the classifier and the estimated accuracy. -->
-<p>Our goal is to find a protein panel that can best predict if levels of expression of them can be used to predict if a person has Autism.</p>
-<p>General Steps:</p>
-<ul>
-<li><p>Remove the bio-marker that is highly correlated with each other with the threshold <code>&gt; 0.9</code>.</p></li>
-<li><p>Apply backwards selection using L1 logistic regression to select top 20 features based on feature importance.</p></li>
-<li><p>Apply random forest with 5 folds cross validation to select top 20 features based on the average feature importance</p></li>
-<li><p>Union the 40 features to use them as the base model, apply backwards selection using elastic net logistic regression (50% L1 and 50% L2) to select a protein panel with 9 bio-markers</p></li>
-<li><p>Fit the final model using L1 logistic regression of 6 bio-markers and achieve the ROC-AUC value of 87.29%</p></li>
-</ul>
+<p>This paper used many different methods to obtain the final protein panel for ASD prediction. After data collection, there was data preprocessing, which included log transforming, z-transforming, and then elimination of outliers. Once the data was ready to be modeled, there were three methods used: random forest, t-test, and correlation-based methods. First, random forest employed a decision tree based learning method that measures feature importance and then ultimately selects the 10 proteins with the highest averaged importance values. Next, they ran t-tests, which is a test to distinguish how significant the difference is between the means of two groups, to select the 10 proteins that had the most significant t-test values. Finally, they measures the correlation, or strength of statistical relationship, between each protein and the total ADOS scores to once again, produce the top 10 most highly correlated proteins.</p>
+<p>After using these three methodologies, there were five proteins common to each method used, which were considered the ‘core’ proteins. To determine if any of the other 13 proteins should also be included in the final panel, there was a logistic regression model trained on the 5 core proteins. After testing out each additional protein to see if they added any predictive power to the model, it was found that four more proteins should be added to the final panel of ‘optimal’ proteins. The AUC for the top 10 proteins identified by each model was: RF = 0.839±0.066, t-test = 0.837±0.066 and ADOS correlation = 0.853±0.066. When combining the five ‘core’ proteins with the other four proteins for our ‘optimal’ proteins gave us an AUC = 0.860±0.064, with a sensitivity = 0.833±0.118, and specificity = 0.846±0.118.</p>
 <div style="display: flex; justify-content: center;">
 <div class="cell">
 <div class="cell-output-display">
@@ -120,8 +112,44 @@ classDef default scale:1;
 </div>
 </div>
 </div>
-<section id="l1-logistic-regression---recursive-feature-elimination" class="level3">
-<h3 class="anchored" data-anchor-id="l1-logistic-regression---recursive-feature-elimination">L1 logistic regression - Recursive Feature Elimination</h3>
+</section>
+<section id="findings" class="level2">
+<h2 class="anchored" data-anchor-id="findings">Findings</h2>
+<section id="impact-of-preprocessing-and-outliers" class="level3">
+<h3 class="anchored" data-anchor-id="impact-of-preprocessing-and-outliers">Impact of preprocessing and outliers</h3>
+<div class="cell" data-hash="report_cache/html/unnamed-chunk-3_84943969e2cb8bf6efeeccefea20fde2">
+<div class="cell-output-display">
+<p><img src="report_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="report_files/figure-html/unnamed-chunk-3-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="report_files/figure-html/unnamed-chunk-3-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="report_files/figure-html/unnamed-chunk-3-4.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="report_files/figure-html/unnamed-chunk-3-5.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="report_files/figure-html/unnamed-chunk-3-6.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="report_files/figure-html/unnamed-chunk-3-7.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>To begin with the preprocessing of the data, we first look at the raw proteins to see how they are distributed. From observing the distribution of a sample of the proteins from the raw file, it is clear that many of them have skewed distributions. These skewed distributions could be due to high variability in the protein levels which leads to outliers that are affecting our data and predictions. To improve our model and predictions, we can log transform the proteins to help normalize the distributions. By doing this, it helps to improve our models performance since machine learning techniques like random forest will give you better predictions when the input data is more normally distributed. As we can observe from the difference in the raw and the log transformed histograms for this sample of proteins, the transformation helps to normalize the distributions of the raw proteins in our dataset.</p>
+<section id="read-in-data" class="level4">
+<h4 class="anchored" data-anchor-id="read-in-data">Read in data</h4>
+<p>If we examine the outlier_summary table, it shows us the biomarkers that have an outlier point as well as the group and ados score for the subject that corresponds to that outlier point. Overall, there are 1822 biomarkers which have at least 1 outlying point. Attempting to identify individual subjects we can filter to only see biomarkers which have an outlier count of 1. Doing this, we see ados values ranging from 6-23 as well as NA. Each of these 18 unique ados values likely correspond to an individual outlying subject that has many outlying biomarkers. There are 449 outlying biomarkers which correspond to a subject which is typically developing, while there are 922 biomarkers which correspond to a subject which is autistic. With this, we can conclude that it’s more likely for an autistic subject to be an outlier subject than it is for those which are typically developing.</p>
+</section>
+</section>
+<section id="methodlogical-variations" class="level3">
+<h3 class="anchored" data-anchor-id="methodlogical-variations">Methodlogical variations</h3>
+<section id="l1-logistic-regression---recursive-feature-elimination" class="level4">
+<h4 class="anchored" data-anchor-id="l1-logistic-regression---recursive-feature-elimination">L1 logistic regression - Recursive Feature Elimination</h4>
 <p>Logistic Regression is used for the second round of selection. The L1 Lasso Regularization is used to select the bio-markers from the total 1194 bio-markers (after dropping the bio-markers with high correlation). L1 Regularization penalizes the features with the least absolute coefficients, or weights, in the logit, and eventually drives them to zero. Those ones are bio-markers that are considered to be less important. We select total 20 candidates with the highest rank. Top ten bio-markers are plotted for neat visualization purpose.</p>
 <div class="cell" data-hash="report_cache/html/L1 logistic regression - Recursive Feature Elimination_8e2cf894f6f451751464208da639933e">
 <div class="cell-output-display">
@@ -129,60 +157,32 @@ classDef default scale:1;
 </div>
 </div>
 </section>
-<section id="random-forest---5-folds-cross-validation" class="level3">
-<h3 class="anchored" data-anchor-id="random-forest---5-folds-cross-validation">Random Forest - 5 folds Cross Validation</h3>
+<section id="random-forest---5-folds-cross-validation" class="level4">
+<h4 class="anchored" data-anchor-id="random-forest---5-folds-cross-validation">Random Forest - 5 folds Cross Validation</h4>
 <p>Random forest Algorithm is applied for the third round of selection. The Gini Importance, or the mean decrease in impurity, is used as the metric to determine the contribution of each bio-marker in predicting the outcome. The feature importance for each feature is computed by averaging the total impurity decrease across all the trees in the forest where the feature is used. Another 20 bio-markers are identified as candidates for final selection. The plot demonstrated the top 10 bio-markers which have the highest log average feature importance.</p>
 <p>We then union two sets of candidates to serve as the pool of our final selection.</p>
-<div class="cell" data-hash="report_cache/html/unnamed-chunk-3_a9b99fae5f34c46f86a5b569e3b08ae6">
+<div class="cell" data-hash="report_cache/html/unnamed-chunk-6_cb386f6559910633f2217b1d604ebbd1">
 <div class="cell-output-display">
-<p><img src="report_files/figure-html/unnamed-chunk-3-3.png" class="img-fluid" width="960"></p>
+<p><img src="report_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="960"></p>
 </div>
 </div>
 </section>
-<section id="elastic-net-logistic-regression---recursive-feature-elimination" class="level3">
-<h3 class="anchored" data-anchor-id="elastic-net-logistic-regression---recursive-feature-elimination">Elastic Net Logistic Regression - Recursive Feature Elimination</h3>
+<section id="elastic-net-logistic-regression---recursive-feature-elimination" class="level4">
+<h4 class="anchored" data-anchor-id="elastic-net-logistic-regression---recursive-feature-elimination">Elastic Net Logistic Regression - Recursive Feature Elimination</h4>
 <p>50% of L1 regularization and 50% of L2 regularization is applied on the Elastic Net Logistic Regression to recursively select bio-markers with each step, finding a 6 bio-markers protein panel which has the best predictive power. While L1 penalization shrinks the least absolute value of coefficients to zero, L2 handles the multicollinearity by distributing importance across correlated features.</p>
 </section>
 </section>
-<section id="findings" class="level2">
-<h2 class="anchored" data-anchor-id="findings">Findings</h2>
-<section id="impact-of-preprocessing-and-outliers" class="level3">
-<h3 class="anchored" data-anchor-id="impact-of-preprocessing-and-outliers">Impact of preprocessing and outliers</h3>
-<div class="cell" data-hash="report_cache/html/unnamed-chunk-4_c97c0aeb66815623e79549e37289c12b">
-<div class="cell-output-display">
-<p><img src="report_files/figure-html/unnamed-chunk-4-5.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="report_files/figure-html/unnamed-chunk-4-6.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="report_files/figure-html/unnamed-chunk-4-7.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="report_files/figure-html/unnamed-chunk-4-8.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="report_files/figure-html/unnamed-chunk-4-9.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="report_files/figure-html/unnamed-chunk-4-10.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="report_files/figure-html/unnamed-chunk-4-11.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<p>To begin with the preprocessing of the data, we first look at the raw proteins to see how they are distributed. From observing the distribution of a sample of the proteins from the raw file, it is clear that many of them have skewed distributions. These skewed distributions could be due to high variability in the protein levels which leads to outliers that are affecting our data and predictions. To improve our model and predictions, we can log transform the proteins to help normalize the distributions. By doing this, it helps to improve our models performance since machine learning techniques like random forest will give you better predictions when the input data is more normally distributed. As we can observe from the difference in the raw and the log transformed histograms for this sample of proteins, the transformation helps to normalize the distributions of the raw proteins in our dataset.</p>
-</section>
-</section>
-<section id="read-in-data" class="level1">
-<h1>read in data</h1>
-<p>If we examine the outlier_summary table, it shows us the biomarkers that have an outlier point as well as the group and ados score for the subject that corresponds to that outlier point. Overall, there are 1822 biomarkers which have at least 1 outlying point. Attempting to identify individual subjects we can filter to only see biomarkers which have an outlier count of 1. Doing this, we see ados values ranging from 6-23 as well as NA. Each of these 18 unique ados values likely correspond to an individual outlying subject that has many outlying biomarkers. There are 449 outlying biomarkers which correspond to a subject which is typically developing, while there are 922 biomarkers which correspond to a subject which is autistic. With this, we can conclude that it’s more likely for an autistic subject to be an outlier subject than it is for those which are typically developing.</p>
-<section id="methodlogical-variations" class="level3">
-<h3 class="anchored" data-anchor-id="methodlogical-variations">Methodlogical variations</h3>
-<p>Task 3</p>
-</section>
 <section id="improved-classifier" class="level3">
 <h3 class="anchored" data-anchor-id="improved-classifier">Improved classifier</h3>
+<p>Our goal is to find a protein panel that can best predict if levels of expression of them can be used to predict if a person has Autism.</p>
+<p>General Steps:</p>
+<ul>
+<li><p>Remove the bio-marker that is highly correlated with each other with the threshold <code>&gt; 0.9</code>.</p></li>
+<li><p>Apply backwards selection using L1 logistic regression to select top 20 features based on feature importance.</p></li>
+<li><p>Apply random forest with 5 folds cross validation to select top 20 features based on the average feature importance</p></li>
+<li><p>Union the 40 features to use them as the base model, apply backwards selection using elastic net logistic regression (50% L1 and 50% L2) to select a protein panel with 9 bio-markers</p></li>
+<li><p>Fit the final model using L1 logistic regression of 6 bio-markers and achieve the ROC-AUC value of 87.29%</p></li>
+</ul>
 <p>The final protein panel is made of 6 bio-markers showed below:</p>
 <div class="cell" data-hash="report_cache/html/print results_34f2085bf9e8ca8e51f6374671dbd129">
 <div class="cell-output cell-output-stdout">
