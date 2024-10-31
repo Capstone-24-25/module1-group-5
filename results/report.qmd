@@ -308,14 +308,14 @@ with open('../data/q4_variables.pkl', 'rb') as f:
   q4_variables = pickle.load(f)
 
 cm = np.loadtxt('../data/confusion_matrix.csv', delimiter=',')
-fig, ax = plt.subplots(figsize=[8, 8])
-ax.imshow(cm, cmap="Blues")
-ax.xaxis.set(ticks=(0, 1), ticklabels=('Predicted TD', 'Predicted ASD'))
-ax.yaxis.set(ticks=(0, 1), ticklabels=('Actual TD', 'Actual ASD'))
+fig, ax = plt.subplots(figsize=[8, 8]);
+ax.imshow(cm, cmap="Blues");
+ax.xaxis.set(ticks=(0, 1), ticklabels=('Predicted TD', 'Predicted ASD'));
+ax.yaxis.set(ticks=(0, 1), ticklabels=('Actual TD', 'Actual ASD'));
 for i in range(2):
   for j in range(2):
-    ax.text(j, i, cm[i, j], ha='center', va='center', color='black', fontdict={'fontsize': 20})
-ax.grid(False)
-ax.set_title('Confusion Matrix of Final Predictions')
+    ax.text(j, i, cm[i, j], ha='center', va='center', color='black', fontdict={'fontsize': 20});
+ax.grid(False);
+ax.set_title('Confusion Matrix of Final Predictions');
 plt.show();
 ```
